@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { WalletButton } from '@/components/WalletButton';
+import { HotelCard } from '@/components/HotelCard';
 
 interface Hotel {
   id: string;
@@ -50,16 +52,13 @@ export default function Home() {
   const searchHotels = async () => {
     if (!query.trim()) return;
     setLoading(true);
-    // Simulate AI processing
+    // Simulate AI processing - will connect to NVIDIA API
     await new Promise((r) => setTimeout(r, 1500));
-    // Filter based on query keywords (mock AI)
     const filtered = mockHotels.filter(
       (h) =>
         h.location.toLowerCase().includes(query.toLowerCase()) ||
-        h.amenities.some((a) =>
-          query.toLowerCase().includes(a.toLowerCase())
-        ) ||
-        query.toLowerCase().includes('luxury') && h.price > 300
+        h.amenities.some((a) => query.toLowerCase().includes(a.toLowerCase())) ||
+        (query.toLowerCase().includes('luxury') && h.price > 300)
     );
     setResults(filtered.length > 0 ? filtered : mockHotels);
     setLoading(false);
@@ -68,12 +67,17 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-          Solana Booking Agent
-        </h1>
-        <p className="text-xl text-gray-300 mb-8">
-          AI-powered hotel booking on Solana — NFT rooms, instant payments, zero overbooking
-        </p>
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+              Solana Booking Agent
+            </h1>
+            <p className="text-xl text-gray-300">
+              AI-powered hotel booking on Solana — NFT rooms, instant payments, zero overbooking
+            </p>
+          </div>
+          <WalletButton />
+        </div>
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
           <label className="block text-sm font-medium mb-2 text-cyan-400">
@@ -90,48 +94,14 @@ export default function Home() {
             disabled={loading || !query}
             className="mt-4 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg font-semibold disabled:opacity-50 hover:opacity-90 transition"
           >
-            {loading ? 'Searching with AI...' : 'Find Hotels'}
+            {loading ? 'AI Thinking...' : 'Find Hotels'}
           </button>
         </div>
 
         {results.length > 0 && (
           <div className="grid gap-6">
             {results.map((hotel) => (
-              <div
-                key={hotel.id}
-                className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:border-cyan-500/50 transition"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h2 className="text-2xl font-semibold text-cyan-400">
-                      {hotel.name}
-                    </h2>
-                    <p className="text-gray-300">{hotel.location}</p>
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      {hotel.amenities.map((a) => (
-                        <span
-                          key={a}
-                          className="text-xs bg-purple-500/30 px-2 py-1 rounded-full"
-                        >
-                          {a}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-bold text-green-400">
-                      {hotel.price} USDC
-                    </p>
-                    <p className="text-sm text-gray-400">per night</p>
-                    <p className="text-sm text-cyan-400 mt-1">
-                      {hotel.roomsAvailable} rooms left
-                    </p>
-                  </div>
-                </div>
-                <button className="mt-4 w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg font-semibold hover:opacity-90 transition">
-                  Book with Solana Pay
-                </button>
-              </div>
+              <HotelCard key={hotel.id} hotel={hotel} />
             ))}
           </div>
         )}
