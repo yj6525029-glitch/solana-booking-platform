@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'export',
-  distDir: 'dist',
+  distDir: 'docs',
+  basePath: '/solana-booking-platform',
   images: {
     unoptimized: true,
   },
