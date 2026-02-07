@@ -1,0 +1,148 @@
+{
+  "hotels": [
+    {
+      "id": "solana-grand-miami",
+      "name": "Solana Grand Hotel",
+      "location": "Miami Beach, FL",
+      "description": "Oceanfront luxury with NFT-based room ownership. Experience crypto-native hospitality.",
+      "price": 250,
+      "priceRange": "luxury",
+      "image": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800",
+        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800"
+      ],
+      "amenities": ["Pool", "WiFi", "Gym", "Beach Access", "Spa", "Restaurant", "Bar", "Room Service"],
+      "rating": 4.9,
+      "reviewCount": 1243,
+      "roomsAvailable": 5,
+      "roomTypes": [
+        {
+          "id": "ocean-suite",
+          "name": "Ocean View Suite",
+          "description": "Panoramic ocean views with private balcony",
+          "price": 350,
+          "maxGuests": 2,
+          "images": ["https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800"]
+        },
+        {
+          "id": "standard-king",
+          "name": "Standard King",
+          "description": "City view with modern amenities",
+          "price": 250,
+          "maxGuests": 2,
+          "images": ["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800"]
+        }
+      ]
+    },
+    {
+      "id": "crypto-valley-zug",
+      "name": "Crypto Valley Resort",
+      "location": "Zug, Switzerland",
+      "description": "Alpine luxury in the heart of Switzerland's Crypto Valley. Perfect for blockchain retreats.",
+      "price": 420,
+      "priceRange": "luxury",
+      "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800",
+        "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800",
+        "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800"
+      ],
+      "amenities": ["Spa", "WiFi", "Restaurant", "Mountain View", "Ski Access", "Conference Rooms", "Bar"],
+      "rating": 4.8,
+      "reviewCount": 856,
+      "roomsAvailable": 3,
+      "roomTypes": [
+        {
+          "id": "alpine-suite",
+          "name": "Alpine Suite",
+          "description": "Breathtaking mountain views with private terrace",
+          "price": 550,
+          "maxGuests": 2,
+          "images": ["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800"]
+        },
+        {
+          "id": "executive-room",
+          "name": "Executive Room",
+          "description": "Modern comfort with workspace",
+          "price": 420,
+          "maxGuests": 2,
+          "images": ["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800"]
+        }
+      ]
+    },
+    {
+      "id": "blockchain-tokyo",
+      "name": "Blockchain Boutique Tokyo",
+      "location": "Tokyo, Japan",
+      "description": "Tech-forward boutique with smart rooms, NFT gallery, and seamless crypto payments.",
+      "price": 180,
+      "priceRange": "mid",
+      "image": "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800",
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800",
+        "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800"
+      ],
+      "amenities": ["WiFi", "Smart Rooms", "Onsen", "City View", "NFT Gallery", "Robot Concierge"],
+      "rating": 4.7,
+      "reviewCount": 2134,
+      "roomsAvailable": 8,
+      "roomTypes": [
+        {
+          "id": "smart-pod",
+          "name": "Smart Pod",
+          "description": "Compact futuristic room with voice control",
+          "price": 180,
+          "maxGuests": 1,
+          "images": ["https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800"]
+        },
+        {
+          "id": "tradition-suite",
+          "name": "Tradition Suite",
+          "description": "Modern comfort meets traditional Japanese design",
+          "price": 280,
+          "maxGuests": 2,
+          "images": ["https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800"]
+        }
+      ]
+    },
+    {
+      "id": "defi-dubai",
+      "name": "DeFi Tower Dubai",
+      "location": "Dubai, UAE",
+      "description": "Crypto-native luxury in the world's blockchain hub. Smart contracts for room access.",
+      "price": 380,
+      "priceRange": "luxury",
+      "image": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800",
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800",
+        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800"
+      ],
+      "amenities": ["Pool", "WiFi", "Gym", "Beach Access", "Spa", "Restaurant", "Bar", "DeFi Lounge"],
+      "rating": 4.8,
+      "reviewCount": 967,
+      "roomsAvailable": 12,
+      "roomTypes": [
+        {
+          "id": "sky-suite",
+          "name": "Sky Suite",
+          "description": "Views of Burj Khalifa with premium amenities",
+          "price": 550,
+          "maxGuests": 2,
+          "images": ["https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800"]
+        },
+        {
+          "id": "deluxe-king",
+          "name": "Deluxe King",
+          "description": "Modern luxury with smart room controls",
+          "price": 380,
+          "maxGuests": 2,
+          "images": ["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800"]
+        }
+      ]
+    }
+  ]
+}
