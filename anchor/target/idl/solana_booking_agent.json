@@ -1,0 +1,316 @@
+{
+  "version": "0.1.0",
+  "name": "solana_booking_agent",
+  "instructions": [
+    {
+      "name": "initializeBooking",
+      "accounts": [
+        {
+          "name": "booking",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hotel",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "guest",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bookingId",
+          "type": "string"
+        },
+        {
+          "name": "checkIn",
+          "type": "i64"
+        },
+        {
+          "name": "checkOut",
+          "type": "i64"
+        },
+        {
+          "name": "roomCount",
+          "type": "u8"
+        },
+        {
+          "name": "totalAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "confirmBooking",
+      "accounts": [
+        {
+          "name": "booking",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hotel",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hotelOwner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "guestTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hotelTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancelBooking",
+      "accounts": [
+        {
+          "name": "booking",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "guest",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "hotel",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "escrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "guestTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "completeBooking",
+      "accounts": [
+        {
+          "name": "booking",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hotel",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hotelOwner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "escrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "hotelTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Booking",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bookingId",
+            "type": "string"
+          },
+          {
+            "name": "guest",
+            "type": "publicKey"
+          },
+          {
+            "name": "hotel",
+            "type": "publicKey"
+          },
+          {
+            "name": "checkIn",
+            "type": "i64"
+          },
+          {
+            "name": "checkOut",
+            "type": "i64"
+          },
+          {
+            "name": "roomCount",
+            "type": "u8"
+          },
+          {
+            "name": "totalAmount",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "BookingStatus"
+            }
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "updatedAt",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hotel",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "hotelId",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "pricePerNight",
+            "type": "u64"
+          },
+          {
+            "name": "currency",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalRooms",
+            "type": "u16"
+          },
+          {
+            "name": "isActive",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "BookingStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Confirmed"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidDates",
+      "msg": "Check-out date must be after check-in date"
+    },
+    {
+      "code": 6001,
+      "name": "BookingExpired",
+      "msg": "Booking has expired"
+    },
+    {
+      "code": 6002,
+      "name": "Unauthorized",
+      "msg": "Unauthorized action"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidStatus",
+      "msg": "Invalid booking status for this operation"
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6005,
+      "name": "CalculationError",
+      "msg": "Calculation error"
+    },
+    {
+      "code": 6006,
+      "name": "HotelInactive",
+      "msg": "Hotel is not active"
+    },
+    {
+      "code": 6007,
+      "name": "NoRoomsAvailable",
+      "msg": "No rooms available for selected dates"
+    }
+  ],
+  "metadata": {
+    "address": "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+  }
+}
