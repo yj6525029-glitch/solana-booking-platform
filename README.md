@@ -30,7 +30,7 @@ Traditional hotel booking systems suffer from critical issues:
 
 ## 🚀 Demo
 
-**🌐 Live URL:** [https://solana-booking-agent.vercel.app](https://solana-booking-agent.vercel.app)
+**🌐 Live URL:** [https://solana-booking-platform.vercel.app](https://solana-booking-platform.vercel.app)
 
 Try it: Click "Connect Wallet" → Type "luxury beach hotel in Miami under $200" → Book!
 
