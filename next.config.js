@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'export',
   distDir: 'docs',
-  basePath: '/solana-booking-platform',
+  // No basePath for Vercel deployment
   images: {
     unoptimized: true,
   },

@@ -112,7 +112,7 @@ export function useEscrowPayment() {
           error: null,
         });
 
-        return { signature, escrowPubkey: escrowPDA.toString() };
+        return { signature };
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Escrow creation failed';
         setState({ ...state, error: message, status: 'failed' });
@@ -159,14 +159,18 @@ export function useEscrowPayment() {
           })
         );
 
-        // Close escrow account (returns rent to guest)
-        transaction.add(
-          SystemProgram.closeAccount({
-            accountPubkey: escrow,
-            destinationPubkey: wallet.publicKey!,
-            programId: SystemProgram.programId,
-          })
-        );
+        // Transfer remaining rent back to guest (close by emptying)
+        const rentExempt = await connection.getMinimumBalanceForRentExemption(0);
+        const remainingBalance = await connection.getBalance(escrow) - rentExempt;
+        if (remainingBalance > 0) {
+          transaction.add(
+            SystemProgram.transfer({
+              fromPubkey: escrow,
+              toPubkey: wallet.publicKey!,
+              lamports: remainingBalance,
+            })
+          );
+        }
 
         const { blockhash } = await connection.getLatestBlockhash();
         transaction.recentBlockhash = blockhash;
