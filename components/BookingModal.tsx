@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { SolanaPayQR } from './SolanaPayQR';
+import { useBookingNFT, BookingData } from '@/hooks/useBookingNFT';
 
 interface Hotel {
   id: string;
@@ -19,27 +20,52 @@ interface BookingModalProps {
   onSuccess: () => void;
 }
 
-// Devnet hotel escrow wallet - in production this would be your program's vault
-const HOTEL_ESCROW_WALLET = '4Z3r4pWk7v8d9s1x2y3z4a5b6c7d8e9f0g1h2i3j4k5l6m7n8o9p0q1r2s3t4u';
+// Devnet platform wallet - receives payments
+const HOTEL_ESCROW_WALLET = 'Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS';
 
 export function BookingModal({ hotel, nights, isOpen, onClose, onSuccess }: BookingModalProps) {
   const [step, setStep] = useState<'confirm' | 'payment' | 'minting' | 'complete'>('confirm');
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const [mintedNft, setMintedNft] = useState<{address: string} | null>(null);
+  
+  const { mintBookingNFT, isLoading: isMinting, error: mintError } = useBookingNFT();
+  
   const totalAmount = hotel.price * nights;
   const memo = `BOOKING-${hotel.id}-${Date.now()}`;
 
-  const handlePaymentSuccess = useCallback((signature: string) => {
+  const handlePaymentSuccess = useCallback(async (signature: string) => {
     setTxSignature(signature);
     setStep('minting');
     
-    // Simulate NFT minting delay (will be replaced with actual Metaplex call)
-    setTimeout(() => {
+    // Mint NFT booking confirmation
+    const checkIn = new Date();
+    const checkOut = new Date();
+    checkOut.setDate(checkOut.getDate() + nights);
+    
+    const bookingData: BookingData = {
+      bookingId: memo,
+      hotelName: hotel.name,
+      location: hotel.location,
+      roomType: 'Standard Room',
+      checkIn: checkIn.toISOString().split('T')[0],
+      checkOut: checkOut.toISOString().split('T')[0],
+      nights,
+      price: totalAmount,
+      customerWallet: HOTEL_ESCROW_WALLET,
+      imageUrl: hotel.image,
+    };
+    
+    const nft = await mintBookingNFT(bookingData);
+    
+    if (nft) {
+      setMintedNft(nft);
       setStep('complete');
       onSuccess();
-    }, 2000);
-  }, [onSuccess]);
+    } else {
+      setError(mintError || 'Failed to mint NFT');
+    }
+  }, [hotel, nights, totalAmount, memo, mintBookingNFT, mintError, onSuccess]);
 
   const handlePaymentError = useCallback((err: string) => {
     setError(err);
@@ -66,7 +92,7 @@ export function BookingModal({ hotel, nights, isOpen, onClose, onSuccess }: Book
                 <h3 className="text-lg font-semibold text-cyan-400">{hotel.name}</h3>
                 <p className="text-gray-400 text-sm">{hotel.location}</p>
               </div>
-              
+
               <div className="bg-black/30 rounded-lg p-4 mb-6">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-400">Price per night</span>
@@ -86,10 +112,7 @@ export function BookingModal({ hotel, nights, isOpen, onClose, onSuccess }: Book
                 <button onClick={onClose} className="flex-1 py-3 bg-white/10 rounded-lg font-medium hover:bg-white/20 transition">
                   Cancel
                 </button>
-                <button 
-                  onClick={() => setStep('payment')} 
-                  className="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg font-semibold hover:opacity-90 transition"
-                >
+                <button onClick={() => setStep('payment')} className="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg font-semibold hover:opacity-90 transition">
                   Proceed to Payment
                 </button>
               </div>
@@ -102,7 +125,6 @@ export function BookingModal({ hotel, nights, isOpen, onClose, onSuccess }: Book
                 <h3 className="text-lg font-semibold text-white mb-1">Pay with Solana Pay</h3>
                 <p className="text-sm text-gray-400">Scan the QR code with your Solana wallet</p>
               </div>
-
               <SolanaPayQR
                 amount={totalAmount}
                 recipient={HOTEL_ESCROW_WALLET}
@@ -112,7 +134,6 @@ export function BookingModal({ hotel, nights, isOpen, onClose, onSuccess }: Book
                 onSuccess={handlePaymentSuccess}
                 onError={handlePaymentError}
               />
-
               {error && (
                 <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
                   {error}
@@ -129,6 +150,7 @@ export function BookingModal({ hotel, nights, isOpen, onClose, onSuccess }: Book
               {txSignature && (
                 <p className="text-xs text-gray-500 mt-4">TX: {txSignature.slice(0, 16)}...</p>
               )}
+              {isMinting && <p className="text-sm text-cyan-400 mt-2">Please approve the transaction...</p>}
             </div>
           )}
 
@@ -137,22 +159,17 @@ export function BookingModal({ hotel, nights, isOpen, onClose, onSuccess }: Book
               <div className="text-6xl mb-4">✅</div>
               <h3 className="text-xl font-bold text-white mb-2">Booking Confirmed!</h3>
               <p className="text-gray-400 mb-4">Your reservation is secured on-chain</p>
-              
               {txSignature && (
-                <a 
-                  href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded-lg text-cyan-400 text-sm hover:bg-cyan-500/30 transition"
-                >
-                  View on Explorer ↗
+                <a href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded-lg text-cyan-400 text-sm hover:bg-cyan-500/30 transition mb-2">
+                  View Payment ↗
                 </a>
               )}
-
-              <button 
-                onClick={onClose} 
-                className="w-full mt-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg font-semibold"
-              >
+              {mintedNft && (
+                <a href={`https://explorer.solana.com/address/${mintedNft.address}?cluster=devnet`} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-lg text-purple-400 text-sm hover:bg-purple-500/30 transition">
+                  View NFT Receipt ↗
+                </a>
+              )}
+              <button onClick={onClose} className="w-full mt-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg font-semibold">
                 Done
               </button>
             </div>
