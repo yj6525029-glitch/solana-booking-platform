@@ -2,18 +2,8 @@
 
 import { useState } from 'react';
 import { BookingModal } from './BookingModal';
-
-interface Hotel {
-  id: string;
-  name: string;
-  location: string;
-  price: number;
-  image: string;
-  amenities: string[];
-  roomsAvailable: number;
-  description: string;
-  rating: number;
-}
+import { MapPin, Star, Users, ChevronRight } from 'lucide-react';
+import { Hotel } from '@/data/hotels';
 
 interface HotelCardProps {
   hotel: Hotel;
@@ -22,97 +12,129 @@ interface HotelCardProps {
 export function HotelCard({ hotel }: HotelCardProps) {
   const [showModal, setShowModal] = useState(false);
   const [selectedNights, setSelectedNights] = useState(1);
+  const [isHovered, setIsHovered] = useState(false);
 
   const totalPrice = (hotel.price * selectedNights).toFixed(2);
 
-  const handleBookingSuccess = () => {
-    console.log('Booking completed:', hotel.id, selectedNights, 'nights');
-  };
+  // Calculate itinerary preview
+  const itinerayPreview = hotel.itinerary.slice(0, 2).map(day => day.title).join(', ');
 
   return (
     <>
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl overflow-hidden border border-white/20 hover:border-cyan-500/50 transition group">
-        {/* Image */}
-        <div className="relative h-48 overflow-hidden">
-          <img src={hotel.image} alt={hotel.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-          <div className="absolute top-3 left-3 bg-black/60 backdrop-blur rounded-full px-3 py-1 text-xs font-medium text-white">
-            ⭐ {hotel.rating}
+      <div 
+        className="glass rounded-2xl overflow-hidden card-hover cursor-pointer group animate-slide-up"
+        style={{ animationDelay: `${parseInt(hotel.id) * 100}ms` }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Image Container */}
+        <div className="relative h-56 overflow-hidden">
+          <img
+            src={hotel.image}
+            alt={hotel.name}
+            className={`w-full h-full object-cover transition-all duration-700 ${
+              isHovered ? 'scale-105 brightness-110' : 'scale-100'
+            }`}
+          />
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent" />
+          
+          {/* Rating Badge */}
+          <div className="absolute top-4 left-4 flex items-center gap-1 glass-strong rounded-full px-3 py-1.5">
+            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+            <span className="text-sm font-semibold text-white">{hotel.rating}</span>
           </div>
-          <div className="absolute top-3 right-3 bg-cyan-500/90 backdrop-blur rounded-full px-3 py-1 text-xs font-medium text-white">
-            {hotel.roomsAvailable} left
+
+          {/* Availability Badge */}
+          <div className={`absolute top-4 right-4 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+            hotel.roomsAvailable > 0 
+              ? 'bg-emerald-500/20 border border-emerald-500/50 text-emerald-400' 
+              : 'bg-rose-500/20 border border-rose-500/50 text-rose-400'
+          }`}>
+            {hotel.roomsAvailable > 0 
+              ? `${hotel.roomsAvailable} rooms left` 
+              : 'Fully booked'}
+          </div>
+
+          {/* Country Tag */}
+          <div className="absolute bottom-4 left-4 glass-strong rounded-full px-3 py-1.5">
+            <span className="text-xs font-medium text-cyan-300">{hotel.country}</span>
           </div>
         </div>
 
         {/* Content */}
         <div className="p-5">
+          {/* Header */}
           <div className="flex justify-between items-start mb-2">
-            <div>
-              <h2 className="text-xl font-semibold text-cyan-400">{hotel.name}</h2>
-              <p className="text-sm text-gray-300">{hotel.location}</p>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors">
+                {hotel.name}
+              </h3>
+              <div className="flex items-center gap-1.5 text-gray-400">
+                <MapPin className="w-4 h-4 text-cyan-400" />
+                <span className="text-sm">{hotel.location}</span>
+              </div>
             </div>
           </div>
-          <p className="text-sm text-gray-400 mb-3 line-clamp-2">{hotel.description}</p>
+
+          {/* Description */}
+          <p className="text-gray-400 text-sm mb-4 line-clamp-2">{hotel.description}</p>
+
+          {/* Itinerary Preview */}
+          <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-white/5">
+            <p className="text-xs text-gray-400 mb-1">Sample itinerary:</p>
+            <p className="text-xs text-cyan-300 font-medium">{itinerayPreview}</p>
+          </div>
 
           {/* Amenities */}
           <div className="flex gap-2 mb-4 flex-wrap">
-            {hotel.amenities.slice(0, 4).map((a) => (
-              <span key={a} className="text-xs bg-purple-500/30 px-2 py-1 rounded-full">
-                {a}
+            {hotel.amenities.slice(0, 5).map((amenity) => (
+              <span 
+                key={amenity} 
+                className="text-xs px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300"
+              >
+                {amenity}
               </span>
             ))}
-            {hotel.amenities.length > 4 && (
-              <span className="text-xs bg-purple-500/30 px-2 py-1 rounded-full">
-                +{hotel.amenities.length - 4}
+            {hotel.amenities.length > 5 && (
+              <span className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-gray-400">
+                +{hotel.amenities.length - 5}
               </span>
             )}
           </div>
 
-          {/* Price & Nights */}
-          <div className="flex items-end justify-between mb-4">
+          {/* Price & Action */}
+          <div className="flex items-end justify-between pt-4 border-t border-white/10">
             <div>
-              <p className="text-2xl font-bold text-green-400">{totalPrice} USDC</p>
-              <p className="text-xs text-gray-400">for {selectedNights} night(s)</p>
+              <p className="text-xs text-gray-400 mb-1">per night</p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-emerald-400">{hotel.price}</span>
+                <span className="text-sm text-gray-400">SOL</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-400">Nights:</label>
-              <select
-                value={selectedNights}
-                onChange={(e) => setSelectedNights(Number(e.target.value))}
-                className="bg-black/30 border border-white/30 rounded px-2 py-1 text-sm"
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 10, 14].map((n) => (
-                  <option key={n} value={n} className="bg-gray-900">
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </div>
+            
+            <button
+              onClick={() => setShowModal(true)}
+              disabled={hotel.roomsAvailable === 0}
+              className="btn-gradient px-5 py-3 rounded-xl font-semibold text-white shadow-lg shadow-cyan-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              Book Now
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-
-          {/* Book Button */}
-          <button
-            onClick={() => setShowModal(true)}
-            disabled={hotel.roomsAvailable === 0}
-            className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {hotel.roomsAvailable > 0 ? (
-              <>
-                💳 Book with Solana Pay
-              </>
-            ) : (
-              'Sold Out'
-            )}
-          </button>
         </div>
       </div>
 
-      {/* Booking Modal */}
-      <BookingModal
-        hotel={hotel}
+      <BookingModal 
+        hotel={hotel} 
         nights={selectedNights}
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSuccess={handleBookingSuccess}
+        onSuccess={() => {
+          setShowModal(false);
+          // Could refresh room availability here
+        }}
       />
     </>
   );
