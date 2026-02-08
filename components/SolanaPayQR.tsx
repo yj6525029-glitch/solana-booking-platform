@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { encodeURL, createQR, findReference, validateTransfer } from '@solana/pay';
+import { encodeURL, createQR } from '@solana/pay';
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
 import BigNumber from 'bignumber.js';
 
@@ -15,55 +15,55 @@ interface SolanaPayQRProps {
   onError: (error: string) => void;
 }
 
-export function SolanaPayQR({
-  amount,
-  recipient,
-  label,
-  message,
-  memo,
-  onSuccess,
-  onError,
-}: SolanaPayQRProps) {
-  const [qrRef, setQrRef] = useState<HTMLDivElement | null>(null);
-  const [status, setStatus] = useState<'pending' | 'processing' | 'confirmed'>('pending');
-  const [signature, setSignature] = useState<string | null>(null);
+// Devnet USDC mint address
+const USDC_DEVNET = new PublicKey('4zMMC9sft5hLUsduh5EuG9XGTgPscsEStFcG7dd9j6cR');
 
+export function SolanaPayQR({ amount, recipient, label, message, memo, onSuccess, onError }: SolanaPayQRProps) {
+  const [qrRef, setQrRef] = useState<HTMLDivElement | null>(null);
+  const [status, setStatus] = useState<'pending' | 'confirmed'>('pending');
+  const [signature, setSignature] = useState<string | null>(null);
+  const [url, setUrl] = useState<string>('');
+
+  // Generate QR code
   useEffect(() => {
     if (!qrRef) return;
-
+    
     try {
-      // Create Solana Pay URL
-      const url = encodeURL({
+      // Create Solana Pay URL for USDC
+      const payUrl = encodeURL({
         recipient: new PublicKey(recipient),
         amount: new BigNumber(amount),
+        splToken: USDC_DEVNET,
         label,
         message,
         memo,
       });
-
-      // Create QR code
-      const qr = createQR(url, 360, 'white', '#1a1a2e');
+      
+      setUrl(payUrl.toString());
+      
+      // Generate QR code
+      const qr = createQR(payUrl, 320, 'white', '#1a1a2e');
       qrRef.innerHTML = '';
       qr.append(qrRef);
     } catch (err) {
       console.error('QR generation error:', err);
-      onError('Failed to generate QR code');
+      onError('Failed to generate QR code: ' + (err instanceof Error ? err.message : String(err)));
     }
-  }, [qrRef, amount, recipient, label, message, memo]);
+  }, [qrRef, amount, recipient, label, message, memo, onError]);
 
-  // Poll for payment verification
+  // Poll for payment
   useEffect(() => {
-    if (!qrRef || status !== 'pending') return;
-
+    if (!url || status !== 'pending') return;
+    
     const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
     const recipientPubkey = new PublicKey(recipient);
-
+    
     const checkPayment = async () => {
       try {
-        // Find the reference in recent signatures
-        const signatures = await connection.getSignaturesForAddress(recipientPubkey, { limit: 10 });
+        // Look for the memo in recent transactions
+        const sigs = await connection.getSignaturesForAddress(recipientPubkey, { limit: 20 });
         
-        for (const sig of signatures) {
+        for (const sig of sigs) {
           if (sig.memo?.includes(memo)) {
             setStatus('confirmed');
             setSignature(sig.signature);
@@ -76,30 +76,33 @@ export function SolanaPayQR({
       }
     };
 
-    const interval = setInterval(checkPayment, 3000);
+    const interval = setInterval(checkPayment, 4000);
     return () => clearInterval(interval);
-  }, [recipient, memo, status, onSuccess]);
+  }, [recipient, memo, status, onSuccess, url]);
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div 
-        ref={setQrRef} 
-        className="bg-white p-4 rounded-lg"
-        style={{ width: 380, height: 380 }}
-      />
+      <div ref={setQrRef} className="bg-white p-4 rounded-lg" style={{ width: 340, height: 340 }} />
       
       <div className="text-center">
         {status === 'pending' && (
           <>
-            <p className="text-lg font-semibold text-white mb-2">Scan with Solana Pay</p>
-            <p className="text-sm text-gray-400">Amount: {amount} USDC</p>
-            <p className="text-xs text-gray-500 mt-2">Waiting for payment...</p>
+            <p className="text-lg font-semibold text-white mb-2">Pay with Solana Pay</p>
+            <p className="text-sm text-cyan-400">{amount} USDC</p>
+            <p className="text-xs text-gray-500 mt-2">Scan with Phantom or Solflare</p>
           </>
         )}
         {status === 'confirmed' && (
           <>
             <p className="text-lg font-semibold text-green-400 mb-2">✅ Payment Received!</p>
-            <p className="text-xs text-gray-400">Signature: {signature?.slice(0, 16)}...</p>
+            <a 
+              href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-cyan-400 underline"
+            >
+              View on Explorer
+            </a>
           </>
         )}
       </div>
