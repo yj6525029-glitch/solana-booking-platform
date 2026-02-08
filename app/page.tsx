@@ -5,12 +5,14 @@ import { WalletButton } from '@/components/WalletButton';
 import { PropertyCard } from '@/components/PropertyCard';
 import { seedListings, Property } from '@/data/listings';
 import { Crown, Search, Plus, TrendingUp } from 'lucide-react';
+import { ListPropertyModal } from '@/components/ListPropertyModal';
 
 export default function Home() {
   const [query, setQuery] = useState('');
   const [listings, setListings] = useState<Property[]>(seedListings);
   const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'villa' | 'penthouse' | 'estate' | 'verified'>('all');
+  const [listModalOpen, setListModalOpen] = useState(false);
 
   const filteredListings = listings.filter(prop => {
     if (activeFilter === 'verified') return prop.verified;
@@ -47,7 +49,7 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 px-4 py-2 glass-luxury rounded-xl text-sm hover:bg-white/5 transition">
+              <button onClick={() => setListModalOpen(true)} className="flex items-center gap-2 px-4 py-2 glass-luxury rounded-xl text-sm hover:bg-white/5 transition">
                 <Plus className="w-4 h-4 text-gold" />
                 List Property
               </button>
@@ -162,6 +164,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+ <ListPropertyModal isOpen={listModalOpen} onClose={() => setListModalOpen(false)} />
     </main>
   );
 }
