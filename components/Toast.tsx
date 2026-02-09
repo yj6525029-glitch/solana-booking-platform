@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Check, X, AlertCircle, Info } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -68,8 +68,6 @@ export function Toast({ message, type, onClose, duration = 4000 }: ToastProps) {
 }
 
 // Toast hook for easy usage
-import { useState, useCallback } from 'react';
-
 export function useToast() {
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
