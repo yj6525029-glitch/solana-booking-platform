@@ -91,21 +91,12 @@ export function BookingFlow({ property, isOpen, onClose, onSuccess }: BookingFlo
               </div>
             </div>
 
-            {/* Price Breakdown */}
-            <div className="glass-luxury rounded-xl p-4 mb-6 space-y-2 text-sm">
-              <div className="flex justify-between text-cream/80">
-                <span>{nights} nights × {property.pricePerNight} SOL</span>
-                <span>{total.toFixed(2)} SOL</span>
-              </div>
-              <div className="flex justify-between text-cream/60">
-                <span>Platform fee (20%)</span>
-                <span>{serviceFee.toFixed(2)} SOL</span>
-              </div>
-              <div className="border-t border-white/10 pt-2 flex justify-between font-bold">
-                <span className="text-cream">Total</span>
-                <span className="text-gold">{total.toFixed(2)} SOL</span>
-              </div>
-            </div>
+          {/* Price Display */}
+          <div className="glass-luxury rounded-xl p-4 mb-6 text-center">
+            <p className="text-xs text-cream/60 mb-1">Total for {nights} nights</p>
+            <p className="text-3xl font-bold text-gold">{total.toFixed(2)} SOL</p>
+            <p className="text-xs text-cream/40 mt-1">({nights} × {property.pricePerNight} SOL/night)</p>
+          </div>
 
             {/* CTA */}
             <button
